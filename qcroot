@@ -1,0 +1,20 @@
+#!/bin/bash
+# use to root qc platform devices
+# without args will get root permission,otherwise switch to normal permission
+# author: guanglixiang@gmail.com
+arg=$1
+if [[ -z "${arg}" ]] ; then
+  adb shell setprop ro.secure 0
+  adb shell setprop ro.debuggable 1
+  adb shell setprop ro.allow.mock.location 1
+  adb shell setprop persist.sys.usb.config mtp,adb
+  sleep 2
+  adb shell /system/bin/setenforce 0
+else
+  adb shell setprop ro.secure 1
+  adb shell setprop ro.debuggable 0
+  adb shell setprop ro.allow.mock.location 0
+  adb shell /system/bin/setenforce 1
+  pid=`adb shell ps | grep adbd| awk '{print $2}'`
+  adb shell kill $pid
+fi
